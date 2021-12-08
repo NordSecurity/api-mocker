@@ -1,0 +1,12 @@
+.vscode
+vendor
+
+# IntelliJ IDEA
+.idea/**/workspace.xml
+.idea/**/vcs.xml
+.idea/**/modules.xml
+.idea/**/api-mocker.iml
+
+.testCoverage.txt
+
+/build

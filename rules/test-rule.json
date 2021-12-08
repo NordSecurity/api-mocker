@@ -1,0 +1,83 @@
+{
+  "rules": [
+    {
+      "endpoint": "/sample",
+      "method": "GET",
+      "items": [
+        {
+          "response": {
+            "status": 200,
+            "headers": [
+              "Content-Type: application/json"
+            ],
+            "body": "{\"message\": \"sample msg\", \"code\": 123}"
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/car/:carId",
+      "method": "POST",
+      "items": [
+        {
+          "query": "123",
+          "body": "{\"name\": \"sample car\"}",
+          "response": {
+            "status": 200,
+            "headers": [
+              "Content-Type: application/json"
+            ],
+            "body": "{\"name\": \"sample car\", \"year\": 1999}"
+          }
+        },
+        {
+          "body": "\"name\":",
+          "response": {
+            "status": 200
+          }
+        },
+        {
+          "response": {
+            "status": 400
+          }
+        }
+      ]
+    },
+    {
+      "endpoint": "/car/:carId",
+      "method": "GET",
+      "items": [
+        {
+          "query": "123",
+          "response": {
+            "status": 200,
+            "headers": [
+              "Content-Type: application/json"
+            ],
+            "body": "{\"name\": \"specific car\", \"year\": 1999}"
+          }
+        },
+        {
+          "query": "666",
+          "response": {
+            "delay": 3000,
+            "status": 200,
+            "headers": [
+              "Content-Type: application/json"
+            ],
+            "body": "{\"name\": \"another car\", \"year\": 2012}"
+          }
+        },
+        {
+          "response": {
+            "status": 200,
+            "headers": [
+              "Content-Type: application/json"
+            ],
+            "body": "{\"name\": \"generic one\", \"year\": 2020}"
+          }
+        }
+      ]
+    }
+  ]
+}
