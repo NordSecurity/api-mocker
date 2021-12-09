@@ -40,7 +40,7 @@ The mock runs on `localhost:8000` by default. These attributes can be changed by
   - `items:` *(mandatory)* an array of rule items where each item is composed by:
     - `query:` *(optional)* an expression to be match against the URL query, if it has one. If not provided, any query will be accepted.
     - `body:` *(optional)* a regex expression to match against the request body. If not provided, any body will be accepted.
-    - `counter`: *(optional)* counter matches the number of calls a request should match (starting from zero). If not provided the matching request will return every time. 
+    - `counter`: *(optional)* counter matches the number of calls a request should match (starting from zero). If not provided the matching request will return every time.
     - `response:` *(mandatory)* a structure containing the response to be sent back if the request rules above match, where:
       - `status:` *(mandatory)* a HTTP code
       - `delay:` *(optional)* delay (in ms) to take before sending the response
@@ -181,11 +181,14 @@ The mock runs on `localhost:8000` by default. These attributes can be changed by
 Starting the api mocker on docker is very simple:
 ```
 docker build -t api-mocker:latest .
-docker run -v "/$(pwd)/rules:/rules" -p 8000:8000 api-mocker:latest  -rules=rules/test-rule.json 
+docker run -v "/$(pwd)/rules:/rules" -p 8000:8000 api-mocker:latest  -rules=rules/test-rule.json
 ```
 note that you always need to define the volume and path for the rules.
 
-### via docker-compose
+It is also possible to use it directly from [Docker Hub](https://hub.docker.com/r/nordsec/api-mocker):
+`docker pull nordsec/api-mocker`
+
+### Via docker-compose
 
 Example ```docker-compose.yml```:
 
