@@ -2,8 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"os"
 )
 
 type Flags struct {
@@ -20,12 +18,6 @@ func ParseFlags() Flags {
 	}
 
 	flag.Parse()
-
-	if len(*s.Rules) == 0 {
-		fmt.Println("Use: -rules rule-file.json [OTHER_OPTIONAL_FLAGS]")
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
 
 	return s
 }

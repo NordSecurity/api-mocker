@@ -34,6 +34,10 @@ type EndpointResponse struct {
 func LoadRulesFromFile(fileName string) (Rules, error) {
 	var rules Rules
 
+	if len(fileName) == 0 {
+		return rules, nil
+	}
+
 	jsonFile, err := os.Open(fileName)
 
 	if err != nil {
