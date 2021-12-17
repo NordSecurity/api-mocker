@@ -96,6 +96,8 @@ func respondOnRuleMatch(
 	rule Rule,
 	handlerFunc func(echo.Context, EndpointRule),
 ) bool {
+	fmt.Printf("%v", rule.Endpoint)
+	println()
 	for _, er := range rule.Items {
 		hash := createCounterHash(rule.Endpoint, rule.Method, er.Body)
 		if isRuleMatch(c, er) && isCounterMatch(hash, er) {
@@ -109,7 +111,8 @@ func respondOnRuleMatch(
 }
 
 func isRuleMatch(c echo.Context, er EndpointRule) bool {
-	return IsQueryMatchRule(c.ParamValues(), er.Query) &&
+	return IsParamMatchRule(c.ParamValues(), er.Param) &&
+		IsQueryStringMatchRule(c.QueryParams(), er.QueryString) &&
 		IsBodyMatchRule(bodyAsString(c.Request()), er.Body)
 }
 

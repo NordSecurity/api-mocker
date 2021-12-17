@@ -1,4 +1,4 @@
-{
+  {
   "rules": [
     {
       "endpoint": "/sample",
@@ -12,6 +12,16 @@
             ],
             "body": "{\"message\": \"sample msg\", \"code\": 123}"
           }
+        },
+        {
+          "queryString": "foo=1&bar=2",
+          "response": {
+            "status": 200,
+            "headers": [
+              "Content-Type: application/json"
+            ],
+            "body": "{\"message\": \"sample msg with query string\", \"code\": 321}"
+          }
         }
       ]
     },
@@ -20,7 +30,7 @@
       "method": "POST",
       "items": [
         {
-          "query": "123",
+          "param": "123",
           "body": "{\"name\": \"sample car\"}",
           "response": {
             "status": 200,
@@ -48,7 +58,7 @@
       "method": "GET",
       "items": [
         {
-          "query": "123",
+          "param": "123",
           "response": {
             "status": 200,
             "headers": [
@@ -58,7 +68,7 @@
           }
         },
         {
-          "query": "666",
+          "param": "666",
           "response": {
             "delay": 3000,
             "status": 200,
