@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"regexp"
@@ -18,10 +19,10 @@ type Rule struct {
 }
 
 type EndpointRule struct {
-	Query    string           `json:"query"`
-	Body     string           `json:"body"`
-	Counter  *int             `json:"counter,omitempty"`
-	Response EndpointResponse `json:"response"`
+	QueryString string           `json:"queryString"`
+	Body        string           `json:"body"`
+	Counter     *int             `json:"counter,omitempty"`
+	Response    EndpointResponse `json:"response"`
 }
 
 type EndpointResponse struct {
@@ -55,8 +56,12 @@ func LoadRulesFromFile(fileName string) (Rules, error) {
 	return rules, nil
 }
 
-func IsQueryMatchRule(qRequest []string, qRule string) bool {
-	return (len(qRequest) > 0 && qRule == qRequest[0]) || qRule == ""
+func IsQueryStringMatchRule(requestQueryString string, ruleQueryString string) bool {
+	if len(ruleQueryString) > 0 {
+		r := regexp.MustCompile(fmt.Sprintf("%s%s", `(?m)`, ruleQueryString))
+		return r.MatchString(requestQueryString)
+	}
+	return true
 }
 
 func IsBodyMatchRule(bRequest string, bRule string) bool {

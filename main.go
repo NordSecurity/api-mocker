@@ -109,7 +109,7 @@ func respondOnRuleMatch(
 }
 
 func isRuleMatch(c echo.Context, er EndpointRule) bool {
-	return IsQueryMatchRule(c.ParamValues(), er.Query) &&
+	return IsQueryStringMatchRule(c.QueryString(), er.QueryString) &&
 		IsBodyMatchRule(bodyAsString(c.Request()), er.Body)
 }
 
@@ -127,9 +127,8 @@ func defineRoutesFromRules(router *echo.Router, rules Rules) {
 		router.Add(rule.Method, rule.Endpoint, func(c echo.Context) error {
 			if !respondOnRuleMatch(c, r, processResponseBasedOnRule) {
 				c.JSON(http.StatusUnprocessableEntity, map[string]interface{}{
-					"rule":  r,
-					"query": c.ParamValues(),
-					"body":  bodyAsString(c.Request()),
+					"rule": r,
+					"body": bodyAsString(c.Request()),
 				})
 			}
 

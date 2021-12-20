@@ -9,21 +9,36 @@ import (
 	"testing"
 )
 
-func TestIsQueryMatchRuleWhenQueryEquals(t *testing.T) {
-	assert.True(t, IsQueryMatchRule([]string{"AnSpecificValueHere"}, "AnSpecificValueHere"))
+func TestIsQueryStringMatchRule(t *testing.T) {
+	type test struct {
+		queryString     string
+		queryStringRule string
+	}
+	tests := []test{
+		{queryString: "foo=1&bar=2", queryStringRule: "foo=1.*bar=2.*|bar=2.*foo=1.*"},
+		{queryString: "bar=2&foo=1", queryStringRule: "foo=1.*bar=2.*|bar=2.*foo=1.*"},
+		{queryString: "foo=1", queryStringRule: "foo=1"},
+		{queryString: "foo=1", queryStringRule: ""},
+		{queryString: "", queryStringRule: ""},
+	}
+	for _, tc := range tests {
+		assert.True(t, IsQueryStringMatchRule(tc.queryString, tc.queryStringRule))
+	}
 }
 
-func TestIsQueryMatchRuleWhenQueryEmpty(t *testing.T) {
-	assert.True(t, IsQueryMatchRule([]string{}, ""))
-}
-
-func TestIsQueryMatchRuleWhenAnyQuery(t *testing.T) {
-	assert.True(t, IsQueryMatchRule([]string{"AnyRandomValue"}, ""))
-}
-
-func TestIsQueryMatchRuleWhenQueryNotMatch(t *testing.T) {
-	assert.False(t, IsQueryMatchRule([]string{"AnyRandomValue"}, "AnotherValue"))
-	assert.False(t, IsQueryMatchRule([]string{}, "AnotherValue"))
+func TestIsQueryStringDoesNotMatchRule(t *testing.T) {
+	type test struct {
+		queryString     string
+		queryStringRule string
+	}
+	tests := []test{
+		{queryString: "foo=1&bar=3", queryStringRule: "foo=1.*bar=2.*|bar=2.*foo=1.*"},
+		{queryString: "foo=1", queryStringRule: "foo=1.*bar=2.*|bar=2.*foo=1.*"},
+		{queryString: "foo=2", queryStringRule: "foo=1"},
+	}
+	for _, tc := range tests {
+		assert.False(t, IsQueryStringMatchRule(tc.queryString, tc.queryStringRule))
+	}
 }
 
 func TestIsBodyMatchRuleWhenBodyEquals(t *testing.T) {
@@ -66,16 +81,21 @@ func TestRespondGetMethod(t *testing.T) {
 func TestRespondPostMethodWhenBodyAndKeyEquals(t *testing.T) {
 	h := func(c echo.Context, er EndpointRule) {}
 	b := bytes.NewBuffer([]byte("{\"key\":123}"))
-	r := Rule{Method: "POST", Items: []EndpointRule{{Query: "AnSpecificValueHere", Body: "{\"key\":123}"}}}
-
+	r := Rule{
+		Endpoint: "/test",
+		Method:   "POST",
+		Items: []EndpointRule{
+			{
+				QueryString: "foo=1.*bar=2.*|bar=2.*foo=1.*",
+				Body:        "{\"key\":123}",
+			},
+		},
+	}
 	e := echo.New()
 	c := e.NewContext(
-		httptest.NewRequest(http.MethodPost, "/", b),
+		httptest.NewRequest(http.MethodPost, "/test?foo=1&bar=2", b),
 		httptest.NewRecorder(),
 	)
-
-	c.SetParamNames("sampleParamKey")
-	c.SetParamValues("AnSpecificValueHere")
 
 	assert.True(t, respondOnRuleMatch(c, r, h))
 }

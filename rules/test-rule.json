@@ -1,9 +1,19 @@
-{
+  {
   "rules": [
     {
       "endpoint": "/sample",
       "method": "GET",
       "items": [
+        {
+          "queryString": "foo=1.*bar=2.*|bar=2.*foo=1.*",
+          "response": {
+            "status": 200,
+            "headers": [
+              "Content-Type: application/json"
+            ],
+            "body": "{\"message\": \"sample msg with query string\", \"code\": 321}"
+          }
+        },
         {
           "response": {
             "status": 200,
@@ -16,11 +26,10 @@
       ]
     },
     {
-      "endpoint": "/car/:carId",
+      "endpoint": "/car/123",
       "method": "POST",
       "items": [
         {
-          "query": "123",
           "body": "{\"name\": \"sample car\"}",
           "response": {
             "status": 200,
@@ -44,11 +53,10 @@
       ]
     },
     {
-      "endpoint": "/car/:carId",
+      "endpoint": "/car/123",
       "method": "GET",
       "items": [
         {
-          "query": "123",
           "response": {
             "status": 200,
             "headers": [
@@ -56,9 +64,14 @@
             ],
             "body": "{\"name\": \"specific car\", \"year\": 1999}"
           }
-        },
+        }
+      ]
+    },
+    {
+      "endpoint": "/car/1234",
+      "method": "GET",
+      "items": [
         {
-          "query": "666",
           "response": {
             "delay": 3000,
             "status": 200,
@@ -67,7 +80,13 @@
             ],
             "body": "{\"name\": \"another car\", \"year\": 2012}"
           }
-        },
+        }
+      ]
+    },
+    {
+      "endpoint": "/car/12345",
+      "method": "GET",
+      "items": [
         {
           "response": {
             "status": 200,
