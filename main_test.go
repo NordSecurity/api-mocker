@@ -9,32 +9,17 @@ import (
 	"testing"
 )
 
-func TestIsParamMatchRuleWhenParamEquals(t *testing.T) {
-	assert.True(t, IsParamMatchRule([]string{"AnSpecificValueHere"}, "AnSpecificValueHere"))
-}
-
-func TestIsParamMatchRuleWhenParamEmpty(t *testing.T) {
-	assert.True(t, IsParamMatchRule([]string{}, ""))
-}
-
-func TestIsParamMatchRuleWhenAnyParam(t *testing.T) {
-	assert.True(t, IsParamMatchRule([]string{"AnyRandomValue"}, ""))
-}
-
-func TestIsParamMatchRuleWhenParamNotMatch(t *testing.T) {
-	assert.False(t, IsParamMatchRule([]string{"AnyRandomValue"}, "AnotherValue"))
-	assert.False(t, IsParamMatchRule([]string{}, "AnotherValue"))
-}
-
 func TestIsQueryStringMatchRule(t *testing.T) {
 	type test struct {
-		queryString     map[string][]string
+		queryString     string
 		queryStringRule string
 	}
 	tests := []test{
-		{queryString: map[string][]string{"foo": {"1"}, "bar": {"2"}}, queryStringRule: "foo=1&bar=2"},
-		{queryString: map[string][]string{"bar": {"2"}, "foo": {"1"}}, queryStringRule: "foo=1&bar=2"},
-		{queryString: map[string][]string{"foo": {"1"}}, queryStringRule: "foo=1"},
+		{queryString: "foo=1&bar=2", queryStringRule: "foo=1.*bar=2.*|bar=2.*foo=1.*"},
+		{queryString: "bar=2&foo=1", queryStringRule: "foo=1.*bar=2.*|bar=2.*foo=1.*"},
+		{queryString: "foo=1", queryStringRule: "foo=1"},
+		{queryString: "foo=1", queryStringRule: ""},
+		{queryString: "", queryStringRule: ""},
 	}
 	for _, tc := range tests {
 		assert.True(t, IsQueryStringMatchRule(tc.queryString, tc.queryStringRule))
@@ -43,13 +28,13 @@ func TestIsQueryStringMatchRule(t *testing.T) {
 
 func TestIsQueryStringDoesNotMatchRule(t *testing.T) {
 	type test struct {
-		queryString     map[string][]string
+		queryString     string
 		queryStringRule string
 	}
 	tests := []test{
-		{queryString: map[string][]string{"foo": {"1"}, "bar": {"2"}}, queryStringRule: ""},
-		{queryString: map[string][]string{"bar": {"2"}, "foo": {"1"}}, queryStringRule: "foo=1"},
-		{queryString: map[string][]string{"foo": {"1"}}, queryStringRule: "foo=2"},
+		{queryString: "foo=1&bar=3", queryStringRule: "foo=1.*bar=2.*|bar=2.*foo=1.*"},
+		{queryString: "foo=1", queryStringRule: "foo=1.*bar=2.*|bar=2.*foo=1.*"},
+		{queryString: "foo=2", queryStringRule: "foo=1"},
 	}
 	for _, tc := range tests {
 		assert.False(t, IsQueryStringMatchRule(tc.queryString, tc.queryStringRule))
@@ -96,16 +81,21 @@ func TestRespondGetMethod(t *testing.T) {
 func TestRespondPostMethodWhenBodyAndKeyEquals(t *testing.T) {
 	h := func(c echo.Context, er EndpointRule) {}
 	b := bytes.NewBuffer([]byte("{\"key\":123}"))
-	r := Rule{Method: "POST", Items: []EndpointRule{{Param: "AnSpecificValueHere", Body: "{\"key\":123}"}}}
-
+	r := Rule{
+		Endpoint: "/test",
+		Method:   "POST",
+		Items: []EndpointRule{
+			{
+				QueryString: "foo=1.*bar=2.*|bar=2.*foo=1.*",
+				Body:        "{\"key\":123}",
+			},
+		},
+	}
 	e := echo.New()
 	c := e.NewContext(
-		httptest.NewRequest(http.MethodPost, "/", b),
+		httptest.NewRequest(http.MethodPost, "/test?foo=1&bar=2", b),
 		httptest.NewRecorder(),
 	)
-
-	c.SetParamNames("sampleParamKey")
-	c.SetParamValues("AnSpecificValueHere")
 
 	assert.True(t, respondOnRuleMatch(c, r, h))
 }

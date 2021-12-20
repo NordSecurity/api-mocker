@@ -38,8 +38,7 @@ The mock runs on `localhost:8000` by default. These attributes can be changed by
   - `endpoint:` *(mandatory)* an expression path to be included in the url routes. Follows go [HttpRouter Lib schema](https://github.com/julienschmidt/httprouter)
   - `method:` *(mandatory)* any http method (`GET`, `POST`, `PUT`, `PATCH`, `DELETE`, `OPTIONS`).
   - `items:` *(mandatory)* an array of rule items where each item is composed by:
-    - `queryString` *(optional)* an expression to be match against the URL query strings, if it has one.
-    - `param:` *(optional)* an expression to be match against the URL param, if it has one. If not provided, any param will be accepted.
+    - `queryString` *(optional)* a regex expression to match against the URL query strings, If not provided, any query string will be accepted.
     - `body:` *(optional)* a regex expression to match against the request body. If not provided, any body will be accepted.
     - `counter`: *(optional)* counter matches the number of calls a request should match (starting from zero). If not provided the matching request will return every time.
     - `response:` *(mandatory)* a structure containing the response to be sent back if the request rules above match, where:
@@ -49,29 +48,14 @@ The mock runs on `localhost:8000` by default. These attributes can be changed by
       - `body:` *(optional)* a string with the response, with optional dynamic parsable rules based on go [gjson lib](https://github.com/tidwall/gjson)
 
 ### Rules by example
-  - A GET method where the param match an specific value
-    ```JSON
-      {
-        "endpoint": "/api/auth/:code",
-        "method": "GET",
-        "items": [
-          {
-            "param": "1234",
-            "response": {
-              "status": 200
-            }
-          }
-        ]
-      }
-    ```
   - A GET method where it matches a specific query string
     ```JSON
     {
-      "endpoint": "/api/auth/:code",
+      "endpoint": "/api/auth",
       "method": "GET",
       "items": [
         {
-          "queryString": "foo=1&bar=2",
+          "queryString": "foo=1.*bar=2.*|bar=2.*foo=1.*",
           "response": {
             "status": 200
           }
