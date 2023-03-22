@@ -4,7 +4,7 @@ A tiny JSON rule based API mocker.
 The API Mocker intends to simulate an API behavior, supported by a group of rules written as a JSON file structure.
 
 ## Dependencies
-  [go 1.17+](https://golang.org/doc/install)
+  [go 1.20+](https://golang.org/doc/install)
 
 ## Running
   - Clone this project
